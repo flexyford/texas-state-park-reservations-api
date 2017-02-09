@@ -20,16 +20,16 @@ function getSinglePark(parkId) {
     .first();
 }
 
-function _getSitesForPark(parkId) {
+function _getSitesForParks(parkIds) {
   return Sites()
-    .where({ park_id: parseInt(parkId) })
-    .orderBy('sites.id')
-    .map(({ id }) => id);
+    .whereIn('park_id', parkIds)
+    .orderBy('id')
+    .map(({ id, park_id }) => { return { id, park_id }; });
 }
 
 
 module.exports = {
   getAllParks,
   getSinglePark,
-  _getSitesForPark
+  _getSitesForParks
 };

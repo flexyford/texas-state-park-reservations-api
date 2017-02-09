@@ -6,11 +6,17 @@ var queries = require('../db/queries');
 
 // *** GET all parks *** //
 router.get('/parks', function(req, res, next) {
+  let body = {};
   queries.getAllParks()
     .then(function(parks) {
-      let body = {
-        parks: parks
-      };
+      Object.assign(body, { parks });
+      return queries._getSitesForParks(parks.map((p) => p.id));
+    })
+    .then(function(sites) {
+      body.parks = body.parks.map((p) => {
+        let siteIds = sites.filter((s) => s.park_id === p.id).map(({id}) => id);
+        return Object.assign({}, p, { sites: siteIds });
+      });
 
       res.status(200).json(body);
     })
@@ -25,12 +31,13 @@ router.get('/parks/:id', function(req, res, next) {
   queries.getSinglePark(req.params.id)
     .then(function(park) {
       Object.assign(body, { park });
-    })
-    .then(function() {
-      return queries._getSitesForPark(req.params.id);
+      return queries._getSitesForParks(park.id);
     })
     .then(function(sites) {
-      Object.assign(body.park, { sites });
+      let park = body.park;
+      let siteIds = sites.filter((s) => s.park_id === park.id).map(({id}) => id);
+      Object.assign(park, { sites: siteIds });
+
       res.status(200).json(body);
     })
     .catch(function(error) {
