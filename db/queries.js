@@ -4,13 +4,32 @@ function Parks() {
   return knex('parks');
 }
 
+function Sites() {
+  return knex('sites');
+}
+
 // *** queries *** //
 
-function getAll() {
+function getAllParks() {
   return Parks().select();
+}
+
+function getSinglePark(parkId) {
+  return Parks()
+    .where('id', parseInt(parkId))
+    .first();
+}
+
+function _getSitesForPark(parkId) {
+  return Sites()
+    .where({ park_id: parseInt(parkId) })
+    .orderBy('sites.id')
+    .map(({ id }) => id);
 }
 
 
 module.exports = {
-  getAll: getAll
+  getAllParks,
+  getSinglePark,
+  _getSitesForPark
 };
