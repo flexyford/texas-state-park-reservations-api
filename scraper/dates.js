@@ -145,7 +145,6 @@ function buildReservationsForCamp(campId, arrivalDate, departureDate) {
 }
 
 function buildReservationsForPark(park, arrivalDate, departureDate) {
-  console.log(`Scraping ${park.name} . . . `);
 
   let reserveworldCampIds = park.reserveworld_camp_ids ?
     park.reserveworld_camp_ids.split(',') : [];
@@ -172,7 +171,9 @@ function requestParks(parks, size) {
   let endDate = moment().add(6, 'months').format('YYYY-MM-DD');
 
   let batch = parks.splice(0, size || parks.length);
-  let batchRequests = batch.map((park) => {
+  let batchRequests = batch.map((park, i) => {
+    let count = parks.length + batch.length - i;
+    console.log(`[${count}]: Scraping ${park.name} . . . `);
     return buildReservationsForPark(park, startDate, endDate).then((result) => {
       console.log(`Finished ${park.name}`);
       return result;
