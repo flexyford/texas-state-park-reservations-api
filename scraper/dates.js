@@ -195,7 +195,7 @@ function scrapePark() {
 
 function scrapeParks() {
   return queries.getAllParks().then((parks) => {
-    return requestParks(parks, 2);
+    return requestParks(parks, 5);
   });
 }
 
