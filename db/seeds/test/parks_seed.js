@@ -63,14 +63,13 @@ exports.seed = function(knex, Promise) {
     })
     .then(function(sites) {
       // Build Enchanted Rock Site Camp Dates
-      let now = moment();
       let days = [1,2,3,4,5,6,7];
 
       let campDates = sites.reduce((campDates, site, index) => {
         let dates = days.map((day) => {
           let available = (days.length * index) + day;
           return knex('camp_dates').insert({
-            date: now.add(day, 'day').format(),
+            date: moment().add(day, 'day').format(),
             available,
             site_id: site.id
           });

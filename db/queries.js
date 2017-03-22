@@ -1,4 +1,5 @@
 var knex = require('./knex.js');
+var moment = require('moment');
 
 function Parks() {
   return knex('parks');
@@ -33,8 +34,7 @@ function getSingleParkBy(attributes = {}) {
 function _getSitesForParks(parkIds) {
   return Sites()
     .whereIn('park_id', parkIds)
-    .orderBy('id')
-    .map(({ id, park_id }) => { return { id, park_id }; });
+    .orderBy('id');
 }
 
 function getAllSites() {
@@ -59,20 +59,35 @@ function getSingleSiteBy(attributes = {}) {
     .first();
 }
 
-function _getCampDatesForSites(siteIds) {
+function _getCampDatesForSites(siteIds, endDate, startDate) {
+  // Defaults to Next 2 Weeks
+  let end = endDate || moment().add(14, 'day').format('YYYY-MM-DD');
+  let start = startDate || moment().format('YYYY-MM-DD');
+
   return CampDates()
     .whereIn('site_id', siteIds)
-    .orderBy('id')
-    .map(({ id, site_id }) => { return { id, site_id }; });
+    .whereBetween('date', [start, end])
+    .orderBy('id');
 }
 
-function getAllCampDates() {
-  return CampDates().select();
+function getAllCampDates(endDate, startDate) {
+  // Defaults to Next 2 Weeks
+  let end = endDate || moment().add(14, 'day').format('YYYY-MM-DD');
+  let start = startDate || moment().format('YYYY-MM-DD');
+
+  return CampDates()
+    .whereBetween('date', [start, end])
+    .select();
 }
 
-function getCampDatesBy(attributes = {}) {
+function getCampDatesBy(attributes = {}, endDate, startDate) {
+  // Defaults to Next 2 Weeks
+  let end = endDate || moment().add(14, 'day').format('YYYY-MM-DD');
+  let start = startDate || moment().format('YYYY-MM-DD');
+
   return CampDates()
     .where(attributes)
+    .whereBetween('date', [start, end])
     .select();
 }
 

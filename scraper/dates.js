@@ -36,6 +36,12 @@ function createOrUpdateCampDate(attributes) {
   });
 
   return campDateQuery.then((campDate) => {
+
+    // Debugging Console
+    if (site_id === 1551) {
+      console.log(`date: ${date} - old: ${campDate.available} - new: ${available}`);
+    }
+
     if (!campDate) {
       return knex('camp_dates').insert({
         date: moment(date).format(),
@@ -59,7 +65,6 @@ function parseRow($row, $header, reserveWorldCampId) {
   let siteAttrs = { type,  reserveworld_camp_id: reserveWorldCampId };
 
   return findSiteBy(siteAttrs).then((site) => {
-
     let campDates = getRowData.call($, $header, ROW.DATES_START, ROW.DATES_END).map((date, i) => {
       let available = getRowData.call($, $row, ROW.DATES_START + i);
 

@@ -40,6 +40,7 @@ describe('API Routes', function() {
 
       expect(response.body).to.be.a('object');
       expect(response.body).to.have.property('parks');
+      expect(response.body).to.have.property('sites');
 
       let parks = response.body.parks;
       expect(parks.length).to.equal(93);
@@ -56,6 +57,70 @@ describe('API Routes', function() {
       expect(park.sites).to.be.a('array');
       expect(park.sites.length).to.equal(3);
       expect(park.sites).to.deep.equal([1,2,3]);
+
+      let sites = response.body.sites;
+      expect(sites.length).to.equal(3);
+
+      let site = sites[0];
+      expect(site).to.exist;
+      expect(site).to.have.property('type');
+      expect(site).to.have.property('pet');
+      expect(site).to.have.property('electric');
+      expect(site).to.have.property('water');
+      expect(site).to.have.property('sewer');
+      expect(site).to.have.property('created_at');
+      expect(site).to.have.property('updated_at');
+
+      expect(site).to.have.property('park');
+      expect(site).to.not.have.property('park_id');
+
+      expect(site).to.not.have.property('camp_dates');
+      expect(site).to.not.have.property('camp_date_ids');
+    });
+  });
+
+  describe('GET /api/v1/parks Query Params', function() {
+    let response;
+
+    describe('Searching for Park by name', function() {
+      beforeEach(function(done) {
+        chai.request(server)
+          .get('/api/v1/parks?name=Enchanted%20Rock')
+          .end(function(err, res) {
+            response = res;
+            done();
+          });
+      });
+
+      it('should return list of one parks', function() {
+        expect(response).to.have.status(200);
+        expect(response).to.be.json; // jshint ignore:line
+
+        expect(response.body).to.be.a('object');
+        expect(response.body).to.have.property('parks');
+
+        // sideloads sites
+        expect(response.body).to.have.property('sites');
+
+        let parks = response.body.parks;
+        expect(parks.length).to.equal(1);
+
+        let park = parks.find((p) => p.name === 'ENCHANTED ROCK SNA');
+
+        expect(park).to.exist;
+        expect(park).to.have.property('name');
+        expect(park).to.have.property('reserveworld_camp_ids');
+        expect(park).to.have.property('created_at');
+        expect(park).to.have.property('updated_at');
+        expect(park).to.have.property('sites');
+
+        expect(park.sites).to.be.a('array');
+        expect(park.sites.length).to.equal(3);
+        expect(park.sites).to.deep.equal([1,2,3]);
+
+        let sites = response.body.sites;
+        expect(sites.length).to.equal(3);
+      });
     });
   });
 
@@ -77,6 +142,9 @@ describe('API Routes', function() {
 
       expect(response.body).to.be.a('object');
       expect(response.body).to.have.property('park');
+
+      // sideloads sites
+      expect(response.body).to.have.property('sites');
 
       let park = response.body.park;
       expect(park).to.have.property('name');
@@ -146,7 +214,7 @@ describe('API Routes', function() {
         });
     });
 
-    it('should return a single park', function() {
+    it('should return a single site', function() {
       expect(response).to.have.status(200);
       expect(response).to.be.json; // jshint ignore:line
 
